@@ -1,0 +1,9 @@
+From John's First Prototype: (Dec 12, 2022)
+ - Arrow keys move cursor
+ - Enter adds things
+ - cmd+opt+shift+down -> extends event
+ - cmd+shift+down -> move event
+ - select text of event
+ - drag to move events
+ - drag+ctrl to push fluid events
+ - "text mode" vs "event mode" (event mode is like the parent, think: cells in python notebook)

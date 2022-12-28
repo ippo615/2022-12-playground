@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>My first Vue app</title>
+  <link rel="stylesheet" href="https://necolas.github.io/normalize.css/8.0.1/normalize.css">
+    <style>
+
+        /* The following question is an interesting read:
+           https://stackoverflow.com/questions/70845195/define-dark-mode-for-both-a-class-and-a-media-query-without-repeat-css-custom-p
+         */
+
+        /* for light mode */
+        /* You should assume light mode is the default/no preference */
+        @media screen and (prefers-color-scheme: light) {
+            body {
+                background-color: white;
+                color: black;
+            }
+        }
+        /* for dark mode */
+        @media screen and (prefers-color-scheme: dark) {
+            body {
+                background-color: black;
+                color: white;
+            }
+        }
+
+
+        /* plain old css */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        }
+
+        /* Hide outline on editable text*/
+        [contentEditable] {
+            outline: 0px solid transparent;
+        }
+        /* Add a working placeholder attribute for contentEditable */
+        [contentEditable=true]:empty:before {
+            content: attr(placeholder);
+            opacity: 0.6;
+        }
+
+        :root {
+            --grout: 10px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            margin: var(--grout, 10px);
+            gap: var(--grout, 10px) var(--grout, 10px);
+        }
+        .item {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--grout, 10px) var(--grout, 10px);
+        }
+        .item:hover {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--grout, 10px) var(--grout, 10px);
+            background-color: rgba(0,0,0, 0.01);
+        }
+        @media screen and (prefers-color-scheme: dark) {
+            .item:hover {
+                background-color: rgba(255,255,255, 0.01);
+            }
+        }
+        .container:focus-within .item {
+            opacity: 0.8;
+        }
+        .item:focus-within {
+            opacity: 1.0 !important;
+        }
+        .flex_notes_because_i_forget {
+            flex-grow: 0;     /* do not grow   - initial value: 0 */
+            flex-shrink: 0;   /* do not shrink - initial value: 1 */
+            flex-basis: 25em; /* width/height  - initial value: auto */
+            flex: 0 0 25em;
+        }
+        .timer {
+            flex: 0 0 4em;
+            text-align: right;
+            opacity: 0.5;
+        }
+        .anchor_menu, .anchor_bullet {
+            cursor: pointer;
+        }
+        .anchor_menu:hover, .anchor_bullet:hover {
+            text-shadow: 0 0 5px black;
+            /* ok-ish outline */
+            /* text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black; */
+        }
+        @media screen and (prefers-color-scheme: dark) {
+            .anchor_menu:hover, .anchor_bullet:hover {
+                text-shadow: 0 0 5px white;
+            }
+        }
+        .item_text {
+            flex: 1 0 auto;
+        }
+
+        .new_todo_entry {
+            margin-top: 20px;
+            opacity: 0.5;
+        }
+        .new_todo_entry:focus {
+            opacity: 1.0;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.2.31/dist/vue.global.min.js"></script>
+</head>
+<body>
+
+  <script type="module">
+
+  // To look at:
+  // https://vuejs.org/examples/#timer
+
+  // Consider sorting the array which will require an index for each element
+  // We should use floats since there will be insertions and for node re-use
+  // i assume that the index should remain the same between calls.
+
+  Vue.createApp({
+    data(){
+      return {
+        serialNumber: 0,
+        inputTodo: '',
+        runningTodo: {
+            timer: null,
+            id: -1,
+            startTime: -1,
+            endTime: -1,
+        },
+        todos: []
+      }
+    },
+    methods: {
+      newTodo(){
+        return {
+            id: this.serialNumber++,
+            text: '',
+            timeRemaining: 60*20*1000,
+        };
+      },
+      addTodo(){
+        let newTodo = this.newTodo();
+        this.todos.push(newTodo);
+        this.inputTodo = '';
+      },
+      removeTodo(todo){
+        this.todos = this.todos.filter((t) => t !== todo)
+      },
+      updateText(todo, event){
+        todo.text = event.target.innerHTML;
+      },
+      prettyTime(ms){
+        let seconds = ms / 1000;
+        let minutes = seconds / 60;
+        let hours = minutes / 60;
+        let intHours = Math.floor(hours);
+        let intMinutes = Math.floor(minutes - intHours*60);
+        let intSeconds = Math.floor(seconds - intMinutes*60);
+        var values = [];
+        if( intHours ){
+            values.push(''+intHours);
+            values.push(String(intMinutes).padStart(2, '0'));
+        }else{
+            values.push(String(intMinutes));
+        }
+        values.push(String(intSeconds).padStart(2, '0'));
+        return values.join(':');
+      },
+      todoById(id){
+        for( let i=0, l=this.todos.length; i<l; i+=1 ){
+            if(this.todos[i].id == id){return this.todos[i];}
+        }
+      },
+      startTodo(id){
+        if(this.runningTodo.id == -1){
+            let todo = this.todoById(id);
+            this.runningTodo.startTime = Date.now();
+            this.runningTodo.id = id;
+            this.runningTodo.endTime = this.runningTodo.startTime+todo.timeRemaining;
+            this.runningTodo.timer = setInterval(() => {
+                let remaining = this.runningTodo.endTime - Date.now();
+                if( remaining <= 0 ){
+                    remaining = 0;
+                    this.stopTodo();
+                }
+                this.todoById(this.runningTodo.id).timeRemaining = remaining;
+            }, 30);
+        }
+      },
+      stopTodo(){
+        if( this.runningTodo.timer ){
+            clearInterval(this.runningTodo.timer);
+            this.runningTodo.index = -1;
+        }
+      },
+      todoKeyDown(todo, index, event){
+        var code = (event.keyCode ? event.keyCode : event.which);
+        if(event.ctrlKey || event.metaKey){
+            if(code == 13) { //Enter keycode
+                // start the timer!
+                this.stopTodo();
+                this.startTodo(todo.id);
+                return false;
+            }
+        }else{
+            if(code == 13) { //Enter keycode
+                let newTodo = this.newTodo();
+                this.todos.splice(index+1, 0, newTodo);
+                event.preventDefault();
+                this.$nextTick(() => {
+                    let refs = this.$refs.todos;
+                    let desiredNode = null;
+                    for(let i=0, l=refs.length; i<l; i+=1){
+                        let ref = refs[i];
+                        if(ref.dataset.todoId==newTodo.id){
+                            desiredNode = ref;
+                            break;
+                        }
+                    }
+                    if(desiredNode){
+                        desiredNode.focus();
+                    }
+                });
+                return false;
+            }
+        }
+      }
+    }
+  }).mount('#app')
+  </script>
+  
+  <div id="app">
+    <input v-model="inputTodo" @keyup.enter="addTodo">
+    <button @click="addTodo">Add</button>
+
+    <div class="container" ref="todo_container">
+        <div class="item" v-for="(todo, index) in todos" :key="todo.id">
+            <div class="timer">{{this.prettyTime(todo.timeRemaining)}}</div>
+            <div class="anchor_menu">⏲</div>
+            <div class="anchor_bullet">🎯</div>
+            <div
+                ref="todos"
+                :data-todo-id="todo.id"
+                class="item_text"
+                contenteditable="true"
+                placeholder="Enter some text here"
+                @blur="updateText(todo, $event)"
+                @keydown="todoKeyDown(todo, index, $event)"
+                v-html="todo.text">
+            </div>
+        </div>
+
+        <div class="item new_todo_entry">
+            <div class="timer"></div>
+            <div class="anchor_menu">➕</div>
+            <div class="anchor_bullet">➕</div>
+            <div
+                class="item_text"
+                contenteditable="true"
+                placeholder="Create a new todo item">
+            </div>
+        </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

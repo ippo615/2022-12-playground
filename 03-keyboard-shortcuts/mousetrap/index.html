@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Mousetrap</title>
+    <link rel="stylesheet" href="https://necolas.github.io/normalize.css/8.0.1/normalize.css">
+    <style>
+
+    </style>
+    <script src="https://craig.global.ssl.fastly.net/js/mousetrap/mousetrap.min.js"></script>
+</head>
+<body>
+    <div id="app"></div>
+    <script type="module">
+        // See https://craig.is/killing/mice
+
+        // ctr or cmd binding
+        Mousetrap.bind('mod+s', function(e) {
+            console.info('ctrl+s or cmd+s');
+            e.preventDefault();
+        });
+        
+        // sequences
+        Mousetrap.bind('r u n', function(e) {
+            console.info('r then u then n');
+            e.preventDefault();
+        });
+
+        // no contexts/context switching is possible
+        
+    </script>
+</body>
+</html>

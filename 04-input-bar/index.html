@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Something Magic</title>
+    <link rel="stylesheet" href="https://necolas.github.io/normalize.css/8.0.1/normalize.css">
+    <style>
+
+        body {
+            margin: 10px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        }
+
+        [contentEditable] {
+            outline: 0px solid transparent;
+        }
+        /* Add a working placeholder attribute for contentEditable */
+        [contentEditable=true]:empty:before {
+            content: attr(placeholder);
+            opacity: 0.6;
+        }
+        [contentEditable=true]:after {
+            content: attr(suggestion);
+            opacity: 0.6;
+        }
+        #input-bar {
+            font-size: 32px;
+            border-radius: 8px;
+            border: 1px solid #000;
+            padding: 10px;
+        }
+    </style>
+    <script src="https://craig.global.ssl.fastly.net/js/mousetrap/mousetrap.min.js"></script>
+</head>
+<body>
+    <div id="input-bar" contenteditable="true" placeholder="What would you like to do?" ></div>
+    <script type="module">
+        class Suggest{
+            // There are several ways to implement this
+            // One way is called a "Trie" (tree of letters, traversal gives the string)
+            // Instead of a "Trie" we could make a simple dictionary of dictionaries of dictionaries of ...
+            //   cat,car -> {c: {a: {r:,t:}}}
+            // Or a dictionary with all the prefixes flattend
+            //   cat, car -> {c:[cat,car], ca:[cat,car]}
+            // Or just search through a list (fast enough for small lists)
+            constructor(){
+                this.suggestions = new Set();
+            }
+            addSuggestion(suggestion){
+                this.suggestions.add(suggestion);
+            }
+            getAllPossible(prompt){
+                let results = [];
+                for (const item of this.suggestions) {
+                    if(item.startsWith(prompt)){
+                        results.push(item);
+                    }
+                }
+                return results;
+            }
+        }
+        var s = new Suggest();
+        s.addSuggestion('save')
+        s.addSuggestion('run')
+        s.addSuggestion('start')
+        s.addSuggestion('find')
+        s.addSuggestion('mississippi')
+        console.info(s.getAllPossible('s'))
+        console.info(s)
+
+        // we need to prevent tab-ing onkeydown otherwise we will not get it onkeyup
+        document.getElementById("input-bar").onkeydown = function(event){
+            if( event.keyCode == 9 ){
+                event.preventDefault();
+            }
+            // prevent an extra letter being flashed if it matches the suggestion
+            // the following only works with lowercase letters or numbers we should
+            // make a function getCharacterToBeInserted(event) -> A, a, B, 1, etc...
+            // so we can check against anything that might be inserted
+            let currentSuggestion = this.getAttribute("suggestion");
+            if( currentSuggestion[0] == String.fromCharCode(event.keyCode).toLowerCase() ){
+                this.setAttribute("suggestion", currentSuggestion.substr(1));
+            }
+            // when the backspace key is pressed we want to remove the letter from the real
+            // text and add it back into the suggestion
+            if( event.keyCode == 8 ){
+                let text = this.textContent;
+                let lastWord = text.substr(text.trim().lastIndexOf(" ")+1);
+                let suggestions = s.getAllPossible(lastWord);
+                let topSuggestion = "";
+                // decrease the lastWord.length by 1 since that is the character being deleted
+                topSuggestion = suggestions[0].substr(lastWord.length-1);
+                this.setAttribute("suggestion", topSuggestion);
+            }
+        }
+
+        document.getElementById("input-bar").onkeyup = function(event){
+            // let text = this.textContent+String.fromCharCode(event.keyCode).toLowerCase();
+            let text = this.textContent;
+            let lastWord = text.substr(text.trim().lastIndexOf(" ")+1);
+            let suggestions = s.getAllPossible(lastWord);
+            let topSuggestion = "";
+            
+            if( text.length == 0 ){
+                this.setAttribute("suggestion", '');
+                return;
+            }
+
+            // Consider not using the suggestion attribute and instead putting
+            // the text in the area so we can add images and formatting too.
+
+            // Clear the suggestion if there are no suggestions
+            if (suggestions.length == 0){
+                this.setAttribute("suggestion", '');
+                return;
+            }
+
+            // Clear the suggestion if it is already there
+            if(lastWord in suggestions){
+                this.setAttribute("suggestion", '');
+                return;
+            }
+
+            topSuggestion = suggestions[0].substr(lastWord.length);
+            // autocomplete on tab
+            if( event.keyCode == 9 ){
+                // https://stackoverflow.com/questions/16601934/js-jquery-contenteditable-insert-text-and-move-cursor-to-end
+                function insertTextAtCursor(text) {
+                    var sel, range;
+                    sel = window.getSelection();
+                    range = sel.getRangeAt(0);
+                    range.deleteContents();
+                    var textNode = document.createTextNode(text);
+                    range.insertNode(textNode);
+                    range.setStartAfter(textNode);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                }
+                // insert the suggestion and clear the suggestions
+                insertTextAtCursor(topSuggestion);
+                this.setAttribute("suggestion", '');
+                event.preventDefault();
+            }else{
+                this.setAttribute("suggestion", topSuggestion);
+            }
+        }
+    </script>
+</body>
+</html>

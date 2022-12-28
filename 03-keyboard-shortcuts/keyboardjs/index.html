@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Keyboardjs</title>
+    <link rel="stylesheet" href="https://necolas.github.io/normalize.css/8.0.1/normalize.css">
+    <style>
+
+    </style>
+    <script src="https://unpkg.com/keyboardjs@2.7.0/dist/keyboard.min.js"></script>
+</head>
+<body>
+
+    <script type="module">
+        // http://robertwhurst.github.io/KeyboardJS/
+
+        const updateReadout = function (e) {
+            let pressedKeys = e.pressedKeys;
+	        document.getElementById("pressed_keys").innerText = pressedKeys.length
+    		    ? pressedKeys.join(', ')
+		        : 'Press some keys...';
+        };
+        keyboardJS.bind(
+            e => updateReadout(e), // keydown
+            e => updateReadout(e)  // keyup
+        );
+        
+        keyboardJS.bind('ctrl + s', (e) => {
+            console.log('ctrl and s pressed');
+            e.preventDefault();
+        });
+
+        // sequences only allow 2 characters and the first must be held
+        keyboardJS.bind('r > u', (e) => {
+            console.log('r held then u pressed');
+        });
+    </script>
+
+    <div id="pressed_keys">
+    </div>
+
+</body>
+</html>

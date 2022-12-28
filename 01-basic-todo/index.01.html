@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>AAAAAAAAHHH!</title>
+        <link rel="stylesheet" href="https://necolas.github.io/normalize.css/8.0.1/normalize.css">
+        <style>
+            body { margin: 0; overflow: hidden;}
+        </style>
+    </head>
+    <body>
+        <div id="item1" contenteditable="true">
+            - Do Dishes
+        </div>
+        <div class="">
+            - Do more dishes
+        </div>
+        <!-- <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script> -->
+        <script>
+            // how to handle displaying things in a contenteditable?
+            // (ie buttons that should be clickable but not editable)
+            // perhaps an overlay when hovered?
+
+            // better data binding: https://jsfiddle.net/v5owbwf0/4/
+            class Thing{
+                constructor(){
+                    this.domNode = null;
+                    this.isCompleted = false;
+                }
+                set text(v){
+                    this.domNode.innerHTML = v;
+                }
+                get text(){
+                    return this.domNode.innerHTML;
+                }
+            }
+            var t = new Thing();
+            t.domNode = document.getElementById("item1");
+            t.text = 'Hello World';
+        </script>
+    </body>
+</html>

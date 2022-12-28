@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>AAAAAAAAHHH!</title>
+        <link rel="stylesheet" href="https://necolas.github.io/normalize.css/8.0.1/normalize.css">
+        <style>
+
+            /* Hide outline on editable text*/
+            [contenteditable] {
+                outline: 0px solid transparent;
+            }
+
+            :root {
+                --grout: 10px;
+            }
+            .container {
+                display: flex;
+                flex-direction: column;
+                margin: var(--grout, 10px);
+                gap: var(--grout, 10px) var(--grout, 10px);
+            }
+            .item {
+                display: flex;
+                align-items: flex-start;
+                gap: var(--grout, 10px) var(--grout, 10px);
+            }
+            .item:hover {
+                display: flex;
+                align-items: flex-start;
+                gap: var(--grout, 10px) var(--grout, 10px);
+                background-color: rgba(0,0,0, 0.01);
+            }
+            .container:focus-within .item {
+                opacity: 0.8;
+            }
+            .item:focus-within {
+                opacity: 1.0 !important;
+            }
+            .flex_notes_because_i_forget {
+                flex-grow: 0;     /* do not grow   - initial value: 0 */
+                flex-shrink: 0;   /* do not shrink - initial value: 1 */
+                flex-basis: 25em; /* width/height  - initial value: auto */
+                flex: 0 0 25em;
+            }
+            .timer {
+                flex: 0 0 4em;
+                text-align: right;
+                color: rgba(0,0,0, 0.5);
+            }
+            .anchor_menu, .anchor_bullet {
+                cursor: pointer;
+            }
+            .anchor_menu:hover, .anchor_bullet:hover {
+                text-shadow: 0 0 5px black;
+                /* ok-ish outline */
+                /* text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black; */
+            }
+            .item_text {
+                flex: 1 0 auto;
+            }
+        </style>
+    </head>
+    <body class="container">
+        <div class="item" id="item1">
+            <div class="timer">20:00</div>
+            <div class="anchor_menu">⏲</div>
+            <div class="anchor_bullet">🎯</div>
+            <div class="item_text" contenteditable="true">Get groceries</div>
+        </div>
+        <div class="item" id="item2">
+            <div class="timer">20:00</div>
+            <div class="anchor_menu">⏲</div>
+            <div class="anchor_bullet">🍔</div>
+            <div class="item_text" contenteditable="true">Do dishes</div>
+        </div>
+        <div class="item" id="item3">
+            <div class="timer">20:00</div>
+            <div class="anchor_menu">⏲</div>
+            <div class="anchor_bullet">🍔</div>
+            <div class="item_text" contenteditable="true">Build App</div>
+        </div>
+        <div class="item" id="item4">
+            <div class="timer">20:00</div>
+            <div class="anchor_menu">⏲</div>
+            <div class="anchor_bullet">🍔</div>
+            <div class="item_text" contenteditable="true">Try webflowy</div>
+        </div>
+        <div class="item" id="item5">
+            <div class="timer">20:00</div>
+            <div class="anchor_menu">⏲</div>
+            <div class="anchor_bullet">🍔</div>
+            <div class="item_text" contenteditable="true">Do more</div>
+        </div>
+        <!-- <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script> -->
+        <script>
+            // how to handle displaying things in a contenteditable?
+            // (ie buttons that should be clickable but not editable)
+            // perhaps an overlay when hovered?
+
+            // better data binding: https://jsfiddle.net/v5owbwf0/4/
+            class Thing{
+                constructor(domNode){
+                    this.domNode = domNode;
+                    this.domNode.onkeydown = this.onKeyDown.bind(this);
+                }
+                onKeyDown(event){
+                    var code = (event.keyCode ? event.keyCode : event.which);
+                    if(event.ctrlKey || event.metaKey){
+                        if(code == 13) { //Enter keycode
+                            // start the timer!
+                            console.info('ctrl+enter');
+                            return false;
+                        }
+                    }else{
+                        if(code == 13) { //Enter keycode
+                            console.info('enter');
+                            return false;
+                        }
+                    }
+                }
+                // databinding removed for now...
+                // set text(v){
+                //     this.domNode.innerHTML = v;
+                // }
+                // get text(){
+                //     return this.domNode.innerHTML;
+                // }
+            }
+
+            var t = new Thing(document.getElementById("item1"));
+            // t.domNode = document.getElementById("item1");
+            // t.text = 'Hello World';
+        </script>
+    </body>
+</html>

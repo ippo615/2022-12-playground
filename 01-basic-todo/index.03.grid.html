@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>AAAAAAAAHHH!</title>
+        <link rel="stylesheet" href="https://necolas.github.io/normalize.css/8.0.1/normalize.css">
+        <style>
+            :root {
+                --grid_size: 32px;
+            }
+            .item {
+                display: grid;
+                grid-template-columns: [extra] 32px [bullet] 32px [main] auto;
+                grid-template-rows: auto;
+                gap: 10px 10px; /* */
+            }
+            .anchor_menu {
+                grid-column: extra / bullet;
+            }
+            .anchor_bullet {
+                grid-column: bullet / main;
+            }
+            .anchor_menu:hover, .anchor_bullet:hover {
+
+            }
+            .item_text {
+
+            }
+        </style>
+    </head>
+    <body>
+        <div class="item" id="item1">
+            <div class="anchor_menu">🍔</div>
+            <div class="anchor_bullet">🎯</div>
+            <div class="item_text" contenteditable="true">Get gorceries</div>
+        </div>
+        <div class="item" id="item2">
+            <div class="anchor_menu">🍔</div>
+            <div class="anchor_bullet">🎯</div>
+            <div class="item_text" contenteditable="true">Do dishes</div>
+        </div>
+        <!-- <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script> -->
+        <script>
+            // how to handle displaying things in a contenteditable?
+            // (ie buttons that should be clickable but not editable)
+            // perhaps an overlay when hovered?
+
+            // better data binding: https://jsfiddle.net/v5owbwf0/4/
+            class Thing{
+                constructor(){
+                    this.domNode = null;
+                    this.isCompleted = false;
+                }
+                set text(v){
+                    this.domNode.innerHTML = v;
+                }
+                get text(){
+                    return this.domNode.innerHTML;
+                }
+            }
+            // var t = new Thing();
+            // t.domNode = document.getElementById("item1");
+            // t.text = 'Hello World';
+        </script>
+    </body>
+</html>

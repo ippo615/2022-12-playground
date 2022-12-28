@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>AAAAAAAAHHH!</title>
+        <link rel="stylesheet" href="https://necolas.github.io/normalize.css/8.0.1/normalize.css">
+        <style>
+            :root {
+                --grid_size: 32px;
+            }
+            .item {
+                display: flex;
+                align-items: center;
+                min-height: var(--grid_size, 50px);
+            }
+            .flex_notes_because_i_forget {
+                flex-grow: 0;     /* do not grow   - initial value: 0 */
+                flex-shrink: 0;   /* do not shrink - initial value: 1 */
+                flex-basis: 25em; /* width/height  - initial value: auto */
+            }
+            .anchor_menu, .anchor_bullet {
+                flex: 0 0 var(--grid_size, 50px);
+                cursor: pointer;
+            }
+            .anchor_menu:hover, .anchor_bullet:hover {
+                text-shadow: 0 0 5px black;
+                /* ok-ish outline */
+                /* text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black; */
+            }
+            .item_text {
+                flex: 1 0 auto;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="item" id="item1">
+            <div class="anchor_menu">🍔</div>
+            <div class="anchor_bullet">🎯</div>
+            <div class="item_text" contenteditable="true">Get gorceries</div>
+        </div>
+        <div class="item" id="item2">
+            <div class="anchor_menu">🍔</div>
+            <div class="anchor_bullet">🎯</div>
+            <div class="item_text" contenteditable="true">Do dishes</div>
+        </div>
+        <!-- <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script> -->
+        <script>
+            // how to handle displaying things in a contenteditable?
+            // (ie buttons that should be clickable but not editable)
+            // perhaps an overlay when hovered?
+
+            // better data binding: https://jsfiddle.net/v5owbwf0/4/
+            class Thing{
+                constructor(){
+                    this.domNode = null;
+                    this.isCompleted = false;
+                }
+                set text(v){
+                    this.domNode.innerHTML = v;
+                }
+                get text(){
+                    return this.domNode.innerHTML;
+                }
+            }
+            // var t = new Thing();
+            // t.domNode = document.getElementById("item1");
+            // t.text = 'Hello World';
+        </script>
+    </body>
+</html>
