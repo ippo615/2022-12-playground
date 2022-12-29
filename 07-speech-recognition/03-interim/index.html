@@ -53,31 +53,38 @@ function testSpeech() {
   recognition = new SpeechRecognition();
   recognition.grammars = speechRecognitionList;
   recognition.lang = 'en-US';
-  recognition.interimResults = false;  // waits for "final" recognition
+  recognition.interimResults = true;  // waits for "final" recognition
   recognition.continuous = true;
-  recognition.maxAlternatives = 1;
+  recognition.maxAlternatives = 4;  // there are multiple options when isFinal
 
   recognition.start();
   eventIndex = 0; 
 
   recognition.onresult = function(event) {
-    // The SpeechRecognitionEvent results property returns a SpeechRecognitionResultList object
-    // The SpeechRecognitionResultList object contains SpeechRecognitionResult objects.
-    // It has a getter so it can be accessed like an array
-    // The first [0] returns the SpeechRecognitionResult at position 0.
-    // Each SpeechRecognitionResult object contains SpeechRecognitionAlternative objects that contain individual results.
-    // These also have getters so they can be accessed like arrays.
-    // The second [0] returns the SpeechRecognitionAlternative at position 0.
-    // We then return the transcript property of the SpeechRecognitionAlternative object 
+    // event.results[eventIndex][0] changes with interimResults
+    // once event.results[eventIndex].isFinal then you can have multiple
+    // options if specified with maxAlternatives so you can access:
+    // event.results[eventIndex][0..maxAlternatives-1] 
+    // which will each have a .transcript and a .confidence
+    // You may even be able to access the alternatives sooner but I dont
+    // see why you would want to yet.
     console.info(event.results);
     let speechResult = event.results[eventIndex][0].transcript.toLowerCase();
     let confidence = event.results[eventIndex][0].confidence;
-    eventIndex += 1;
-    logMessage(`${speechResult} <span class="muted">(confidence: ${confidence})</span>`);
+    let isFinal = event.results[eventIndex].isFinal;
+    if(isFinal){
+        logMessage(`[${eventIndex}] ${speechResult} <span class="muted">(confidence: ${confidence.toFixed(2)})</span>`);
+        eventIndex += 1;
+    }else{
+        logMessage(`<span class="muted">[${eventIndex}] ${speechResult} (confidence: ${confidence.toFixed(2)})</span>`);
+    }
   }
 
+  // For continuous recording, I thought we ccould just not stop it here.
+  // But it seems to stop after some time anyway perhaps after some
+  // silence it automatically stops.
   recognition.onspeechend = function() {
-    recognition.stop();
+    // recognition.stop();
     btnSpeechStart.textContent = btnMessageStart;
   }
 
