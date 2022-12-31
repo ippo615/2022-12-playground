@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Speech Recognition Setup</title>
+    <link rel="stylesheet" href="https://necolas.github.io/normalize.css/8.0.1/normalize.css">
+    <style>
+        .muted {opacity: 0.4}
+        body {
+            height: 100vh;
+            width: 100vw;
+            padding: 0;
+            margin: 0;
+        }
+        #toolbar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2em;
+            line-height: 2em;
+            padding-left: 4px;
+            vertical-align: middle;
+            border-bottom: 1px solid #888;
+        }
+        #status-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 4px;
+            border-top: 1px solid #888;
+        }
+        #speech-result {
+            position: absolute;
+            top: 2em;
+            left: 0;
+            right: 0;
+            bottom: 1em;
+        }
+        #speech-interim {
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div id="toolbar">
+        <button id="btn-speech-start">I have something to say!</button>
+    </div>
+    <div id="speech-result" class="editor" contenteditable="true">
+        <span id="speech-interim"></span>
+    </div>
+    <div id="status-bar">Status</div>
+
+    <script type="module">
+var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList;
+var SpeechRecognitionEvent = SpeechRecognitionEvent || webkitSpeechRecognitionEvent;
+
+let btnSpeechStart = document.getElementById("btn-speech-start");
+var btnMessageStart = 'I have something to say!';
+var btnMessageStop = 'Stop listening!';
+
+// We need to keep track of the onresult count so we know which element
+// in the array is the new thing.
+// We may be able to make it feel even more responsive by using the
+// interimResults -- but i'll put that in another example.
+let eventIndex = 0;
+
+let recognition = null;
+let nodeResult = document.getElementById("speech-result");
+let statusBar = document.getElementById("status-bar")
+function logMessage(msg){
+    // add formatting...
+    statusBar.innerHTML = msg;
+}
+function showInterim(msg){
+    document.getElementById("speech-interim").textContent = msg;
+}
+function showFinal(msg){
+    let node = document.getElementById("speech-interim");
+    node.insertAdjacentHTML("beforeBegin", `${msg}`);
+}
+
+function testSpeech() {
+  if( btnSpeechStart.textContent == btnMessageStop ){
+    recognition.stop();
+    btnSpeechStart.textContent = btnMessageStart;
+    return;
+  }
+
+  btnSpeechStart.textContent = btnMessageStop;
+
+  // replace "Hello World" with any phrase you want to try to recognize
+  var phrase = 'hello world';
+  var grammar = `#JSGF V1.0; grammar phrase; public <phrase> = ${phrase};`;
+  var speechRecognitionList = new SpeechGrammarList();
+  speechRecognitionList.addFromString(grammar, 1);
+  
+  recognition = new SpeechRecognition();
+  recognition.grammars = speechRecognitionList;
+  recognition.lang = 'en-US';
+  recognition.interimResults = true;  // waits for "final" recognition
+  recognition.continuous = true;
+  recognition.maxAlternatives = 4;  // there are multiple options when isFinal
+
+  recognition.start();
+  eventIndex = 0; 
+
+  recognition.onresult = function(event) {
+    // event.results[eventIndex][0] changes with interimResults
+    // once event.results[eventIndex].isFinal then you can have multiple
+    // options if specified with maxAlternatives so you can access:
+    // event.results[eventIndex][0..maxAlternatives-1] 
+    // which will each have a .transcript and a .confidence
+    // You may even be able to access the alternatives sooner but I dont
+    // see why you would want to yet.
+    console.info(event.results);
+    let speechResult = event.results[eventIndex][0].transcript.toLowerCase();
+    let confidence = event.results[eventIndex][0].confidence;
+    let isFinal = event.results[eventIndex].isFinal;
+    if(isFinal){
+        showInterim("");
+        showFinal(speechResult);
+        logMessage(`[${eventIndex}] ${speechResult} <span class="muted">(confidence: ${confidence.toFixed(2)})</span>`);
+        eventIndex += 1;
+    }else{
+        showInterim(speechResult);
+        logMessage(`<span class="muted">[${eventIndex}] ${speechResult} (confidence: ${confidence.toFixed(2)})</span>`);
+    }
+  }
+
+  // For continuous recording, I thought we ccould just not stop it here.
+  // But it seems to stop after some time anyway perhaps after some
+  // silence it automatically stops.
+  recognition.onspeechend = function() {
+    // recognition.stop();
+    btnSpeechStart.textContent = btnMessageStart;
+  }
+
+  recognition.onerror = function(event) {
+    btnSpeechStart.textContent = btnMessageStart;
+    logMessage('Error occurred in recognition: ' + event.error);
+  }
+  
+  recognition.onaudiostart = function(event) {
+      //Fired when the user agent has started to capture audio.
+      logMessage('SpeechRecognition.onaudiostart');
+  }
+  
+  recognition.onaudioend = function(event) {
+      //Fired when the user agent has finished capturing audio.
+      logMessage('SpeechRecognition.onaudioend');
+  }
+  
+  recognition.onend = function(event) {
+      //Fired when the speech recognition service has disconnected.
+      logMessage('SpeechRecognition.onend');
+  }
+  
+  recognition.onnomatch = function(event) {
+      //Fired when the speech recognition service returns a final result with no significant recognition. This may involve some degree of recognition, which doesn't meet or exceed the confidence threshold.
+      logMessage('SpeechRecognition.onnomatch');
+  }
+  
+  recognition.onsoundstart = function(event) {
+      //Fired when any sound — recognisable speech or not — has been detected.
+      logMessage('SpeechRecognition.onsoundstart');
+  }
+  
+  recognition.onsoundend = function(event) {
+      //Fired when any sound — recognisable speech or not — has stopped being detected.
+      logMessage('SpeechRecognition.onsoundend');
+  }
+  
+  recognition.onspeechstart = function (event) {
+      //Fired when sound that is recognised by the speech recognition service as speech has been detected.
+      logMessage('SpeechRecognition.onspeechstart');
+  }
+  recognition.onstart = function(event) {
+      //Fired when the speech recognition service has begun listening to incoming audio with intent to recognize grammars associated with the current SpeechRecognition.
+      logMessage('SpeechRecognition.onstart');
+  }
+}
+
+btnSpeechStart.addEventListener('click', testSpeech);
+    </script>
+</body>
+</html>
