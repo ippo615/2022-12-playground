@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Speech Recognition Setup</title>
+    <link rel="stylesheet" href="https://necolas.github.io/normalize.css/8.0.1/normalize.css">
+    <style>
+        .muted {opacity: 0.4}
+        body {
+            height: 100vh;
+            width: 100vw;
+            padding: 0;
+            margin: 0;
+        }
+        #toolbar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2em;
+            line-height: 2em;
+            padding-left: 4px;
+            vertical-align: middle;
+            border-bottom: 1px solid #888;
+        }
+        #status-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 4px;
+            border-top: 1px solid #888;
+        }
+        #speech-result {
+            position: absolute;
+            top: 2em;
+            left: 0;
+            right: 0;
+            bottom: 1em;
+        }
+        #speech-interim {
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div id="toolbar">
+        <button id="btn-play-sound">Roar!!</button>
+    </div>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/howler@2.2.3/dist/howler.core.min.js"></script>
+    <script type="module">
+        // for documentation: https://github.com/goldfire/howler.js
+        var sound = new Howl({
+            //src: ['https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3']
+            src: ["https://www.dropbox.com/s/nlxnvscucwz9lna/End%20Bell%201.mp3?dl=0&raw=1"]
+        });
+
+        document.getElementById("btn-play-sound").onclick = ( () => {
+            sound.play()
+        });
+    </script>
+</body>
+</html>

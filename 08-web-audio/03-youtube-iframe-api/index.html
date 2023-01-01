@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Embedded Youtube Sound</title>
+    <link rel="stylesheet" href="https://necolas.github.io/normalize.css/8.0.1/normalize.css">
+    <style>
+        .muted {opacity: 0.4}
+        body {
+            height: 100vh;
+            width: 100vw;
+            padding: 0;
+            margin: 0;
+        }
+        #toolbar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2em;
+            line-height: 2em;
+            padding-left: 4px;
+            vertical-align: middle;
+            border-bottom: 1px solid #888;
+        }
+        #main {
+            position: absolute;
+            top: 2em;
+            left: 0;
+            right: 0;
+            bottom: 1em;
+        }
+        #speech-interim {
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div id="toolbar">
+        <button id="btn-play-sound">Play</button>
+        <input id="video-url" type="text" placeholder="Full Youtube Video URL"></input>
+    </div>
+    <div id="main">
+        <div id="youtube-video-player"></div>
+    </div>
+    <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
+    
+
+    <script>
+      // 2. This code loads the IFrame Player API code asynchronously.
+      var tag = document.createElement('script');
+
+      tag.src = "https://www.youtube.com/iframe_api";
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+      // 3. This function creates an <iframe> (and YouTube player)
+      //    after the API code downloads.
+      var player;
+      function onYouTubeIframeAPIReady() {
+        player = new YT.Player('youtube-video-player', {
+          height: '390',
+          width: '640',
+          videoId: 'M7lc1UVf-VE',
+          playerVars: {
+            'playsinline': 1
+          }
+        });
+      }
+
+    </script>
+
+    <script type="module">
+
+        // https://stackoverflow.com/questions/8486099/how-do-i-parse-a-url-query-parameters-in-javascript
+        function getJsonFromUrl(url) {
+            if(!url) url = location.href;
+            var question = url.indexOf("?");
+            var hash = url.indexOf("#");
+            if(hash==-1 && question==-1) return {};
+            if(hash==-1) hash = url.length;
+            var query = question==-1 || hash==question+1 ? url.substring(hash) : 
+            url.substring(question+1,hash);
+            var result = {};
+            query.split("&").forEach(function(part) {
+                if(!part) return;
+                part = part.split("+").join(" "); // replace every + with space, regexp-free version
+                var eq = part.indexOf("=");
+                var key = eq>-1 ? part.substr(0,eq) : part;
+                var val = eq>-1 ? decodeURIComponent(part.substr(eq+1)) : "";
+                var from = key.indexOf("[");
+                if(from==-1) result[decodeURIComponent(key)] = val;
+                else {
+                    var to = key.indexOf("]",from);
+                    var index = decodeURIComponent(key.substring(from+1,to));
+                    key = decodeURIComponent(key.substring(0,from));
+                    if(!result[key]) result[key] = [];
+                    if(!index) result[key].push(val);
+                    else result[key][index] = val;
+                }
+            });
+            return result;
+        }
+
+        document.getElementById("btn-play-sound").onclick = ( () => {
+            let url = document.getElementById("video-url").value;
+            // Youtube urls typically look like: https://www.youtube.com/watch?v=6rioJ_5MoGk
+            // ?v=6rioJ_5MoGk --> 6rioJ_5MoGk is the video id
+            // for testing: ?v=_J9NqjxIWcg
+            let data = getJsonFromUrl(url);
+            player.loadVideoById({
+                'videoId': data.v,
+                'startSeconds': 0,
+            });
+            player.playVideo();
+            // player.pauseVideo();
+        });
+    </script>
+</body>
+</html>

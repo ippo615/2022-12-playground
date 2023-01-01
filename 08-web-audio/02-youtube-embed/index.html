@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Embedded Youtube Sound</title>
+    <link rel="stylesheet" href="https://necolas.github.io/normalize.css/8.0.1/normalize.css">
+    <style>
+        .muted {opacity: 0.4}
+        body {
+            height: 100vh;
+            width: 100vw;
+            padding: 0;
+            margin: 0;
+        }
+        #toolbar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2em;
+            line-height: 2em;
+            padding-left: 4px;
+            vertical-align: middle;
+            border-bottom: 1px solid #888;
+        }
+        #main {
+            position: absolute;
+            top: 2em;
+            left: 0;
+            right: 0;
+            bottom: 1em;
+        }
+        #speech-interim {
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div id="toolbar">
+        <button id="btn-play-sound">Play</button>
+        <input id="video-url" type="text" placeholder="Full Youtube Video URL"></input>
+    </div>
+    <div id="main"></div>
+
+    <script type="module">
+
+        // https://stackoverflow.com/questions/8486099/how-do-i-parse-a-url-query-parameters-in-javascript
+        function getJsonFromUrl(url) {
+            if(!url) url = location.href;
+            var question = url.indexOf("?");
+            var hash = url.indexOf("#");
+            if(hash==-1 && question==-1) return {};
+            if(hash==-1) hash = url.length;
+            var query = question==-1 || hash==question+1 ? url.substring(hash) : 
+            url.substring(question+1,hash);
+            var result = {};
+            query.split("&").forEach(function(part) {
+                if(!part) return;
+                part = part.split("+").join(" "); // replace every + with space, regexp-free version
+                var eq = part.indexOf("=");
+                var key = eq>-1 ? part.substr(0,eq) : part;
+                var val = eq>-1 ? decodeURIComponent(part.substr(eq+1)) : "";
+                var from = key.indexOf("[");
+                if(from==-1) result[decodeURIComponent(key)] = val;
+                else {
+                    var to = key.indexOf("]",from);
+                    var index = decodeURIComponent(key.substring(from+1,to));
+                    key = decodeURIComponent(key.substring(0,from));
+                    if(!result[key]) result[key] = [];
+                    if(!index) result[key].push(val);
+                    else result[key][index] = val;
+                }
+            });
+            return result;
+        }
+
+        document.getElementById("btn-play-sound").onclick = ( () => {
+            let url = document.getElementById("video-url").value;
+            // Youtube urls typically look like: https://www.youtube.com/watch?v=6rioJ_5MoGk
+            // ?v=6rioJ_5MoGk --> 6rioJ_5MoGk is the video id
+            // for testing: ?v=_J9NqjxIWcg
+            let data = getJsonFromUrl(url);
+            let id = data.v;
+            // we can autoplay if muted... but that defeats the purpose
+            // we want to autoplay with sound
+            main.innerHTML = `<iframe width="560" height="315" src="https://www.youtube.com/embed/${id}?autoplay=1&mute=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+            // main.innerHTML = `<iframe width="560" height="315" src="https://www.youtube.com/embed/${id}?autoplay=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+            // main.innerHTML = `<iframe id="video" src="${url}?rel=0&autoplay=1" frameborder="0"></iframe>`;
+
+            // TODO, look at:
+            // https://developers.google.com/youtube/iframe_api_reference
+        });
+    </script>
+</body>
+</html>
