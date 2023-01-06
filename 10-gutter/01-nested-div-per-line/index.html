@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gutter Test - Nested Divs</title>
+    <link rel="stylesheet" href="https://necolas.github.io/normalize.css/8.0.1/normalize.css">
+    <style>
+        body {
+            height: 100vh;
+            width: 100vw;
+            padding: 0;
+            margin: 0;
+            position: relative;
+        }
+        #toolbar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 48px;
+            line-height: 48px;
+            padding-left: 12px;
+            vertical-align: middle;
+            border-bottom: 1px solid #888;
+        }
+        #editor {
+            position: absolute;
+            top: 48px;
+            left: 0;
+            right: 0;
+            bottom: 1em;
+        }
+        #speech-interim {
+            opacity: 0.5;
+        }
+        .line {
+            position: relative;
+            --gutter-size: 50px;
+        }
+        .line > .gutter {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            position: absolute;
+            left: 0;
+            width: var(--gutter-size, 50px);
+            text-align: right;
+            color:darkgrey;
+        }
+        .line > .content {
+            position: relative; 
+            left: 0;
+            right: 0px; 
+            top: 0px; 
+            padding: 0px calc(var(--gutter-size, 50px) + 5px);
+        }
+
+    </style>
+</head>
+<body>
+    <div id="toolbar">
+        <button id="btn">A Button!</button>
+    </div>
+    <div id="editor">
+        <div class="line">
+            <div class="gutter">0:00</div>
+            <div class="content"> Hello World </div>
+        </div>
+        <div class="line">
+            <div class="gutter">0:00</div>
+            <div class="content"> Hello World </div>
+        </div>
+        <div class="line">
+            <div class="gutter">0:00</div>
+            <div class="content"> Hello World </div>
+        </div>
+        <div class="line">
+            <div class="gutter">0:00</div>
+            <div class="content"> Hello World </div>
+        </div>
+        <div class="line">
+            <div class="gutter">0:00</div>
+            <div class="content"> Hello World </div>
+        </div>
+    </div>
+
+</body>
+</html>
