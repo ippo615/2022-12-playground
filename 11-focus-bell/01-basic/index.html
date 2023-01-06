@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Focus Watchdog</title>
+    <link rel="stylesheet" href="https://necolas.github.io/normalize.css/8.0.1/normalize.css">
+    <style>
+        body {
+            height: 100vh;
+            width: 100vw;
+            padding: 0;
+            margin: 0;
+            position: relative;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        }
+        #toolbar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 48px;
+            line-height: 48px;
+            padding-left: 12px;
+            vertical-align: middle;
+            border-bottom: 1px solid #888;
+        }
+        #editor {
+            position: absolute;
+            top: 48px;
+            left: 0;
+            right: 0;
+            bottom: 1em;
+        }
+        #status-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 4px;
+            border-top: 1px solid #888;
+        }
+        #speech-interim {
+            opacity: 0.5;
+        }
+        .line {
+            position: relative;
+            --gutter-size: 150px;
+        }
+        .line > .gutter {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            position: absolute;
+            left: 0;
+            width: var(--gutter-size, 50px);
+            text-align: right;
+            color:darkgrey;
+        }
+        .line > .content {
+            position: relative; 
+            left: 0;
+            right: 0px; 
+            top: 0px; 
+            padding: 0px calc(var(--gutter-size, 50px) + 5px);
+        }
+
+    </style>
+</head>
+<body>
+    <div id="toolbar">
+        <input type="text" id="text-watchdog-duration" placeholder="Watchdog timer: 30 seconds"></button>
+        <input type="text" id="text-watchdog-phrase" placeholder="Watchdog phrase: hello"></button>
+        <button id="btn-speech-start">I have something to say!</button>
+        <select id="select-language"></select>&nbsp;<select id="select-dialect"></select>
+    </div>
+    <div id="editor">
+        <div class="line">
+            <div class="gutter">0:00</div>
+            <div class="content"> Hello World </div>
+        </div>
+        <div class="line">
+            <div class="gutter">0:00</div>
+            <div class="content"> Hello World </div>
+        </div>
+        <div class="line">
+            <div class="gutter">0:00</div>
+            <div class="content"> Hello World </div>
+        </div>
+        <div class="line">
+            <div class="gutter">0:00</div>
+            <div class="content"> Hello World </div>
+        </div>
+        <div class="line">
+            <div class="gutter">0:00</div>
+            <div class="content"> Hello World </div>
+        </div>
+    </div>
+    <div id="status-bar"></div>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/howler@2.2.3/dist/howler.core.min.js"></script>
+    <script type="text/javascript" src="speech_recognizer.js"></script>
+    <script type="text/javascript" src="speech_captioner.js"></script>
+    <script type="text/javascript" src="speech_captioner_with_watchdog.js"></script>
+    <script type="text/javascript" src="lang_select.js"></script>
+    <script type="text/javascript" src="watchdog.js"></script>
+    <script type="text/javascript" src="main.js"></script>
+
+</body>
+</html>
