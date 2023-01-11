@@ -1,0 +1,6 @@
+[X] Clearer/more common time format on the side
+[ ] Display showing how much time is left before next bell
+[ ] Display showing what phrase is being listened for
+    if no phase show "Timer resets on any spoken word" (or similar)
+[ ] Create a clear workflow/button activation/deactivation
+[ ] Makes a clear intent for what you should be focusing on
