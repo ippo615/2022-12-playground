@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Focus Watchdog</title>
+    <link rel="stylesheet" href="https://necolas.github.io/normalize.css/8.0.1/normalize.css">
+    <style>
+        body {
+            height: 100vh;
+            width: 100vw;
+            padding: 0;
+            margin: 0;
+            position: relative;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        }
+        form {
+            max-width: 640px;
+            padding: 10px;
+        }
+        label, input {
+            display: block;
+        }
+        label {
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <textarea>Type some stuff here</textarea>
+    <form>
+        <label for="name">Name</label>
+        <input type="text" id="name"/>
+
+        <label for="birthday">Birthday</label>
+        <input type="date" id="birthday" />
+    </form>
+    <script type="text/javascript" src="main.js"></script>
+
+</body>
+</html>
