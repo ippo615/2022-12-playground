@@ -1,0 +1,5 @@
+.muted {opacity: 0.4}
+label, input, select {display: block;}
+label {
+    padding-top: 10px;
+}

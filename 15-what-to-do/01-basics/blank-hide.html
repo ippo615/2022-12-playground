@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Voice Based Todo Tracker</title>
+    <link rel="stylesheet" type="text/css" href="layout.css">
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <style>
+        @media (min-width:1024px) {
+            .holy-grail-grid.focus-mode {
+                grid-template-columns: 0fr 2fr 2fr 0fr;
+                grid-template-rows: 10px auto 10px;
+                grid-template-areas:
+                    'header header header header'
+                    'left-sidebar main-content main-content right-sidebar'
+                    'footer footer footer footer';
+            }
+            .holy-grail-grid:has(.left-sidebar:hover) {
+                grid-template-columns: 2fr 1fr 1fr 1fr;
+            }
+            .holy-grail-grid:has(.right-sidebar:hover) {
+                grid-template-columns: 1fr 1fr 1fr 2fr;
+            }
+            .holy-grail-grid:has(.main-content:hover) {
+                grid-template-columns: 1fr 4fr 4fr 1fr;
+            }
+            /* .holy-grail-grid,
+            .holy-grail-grid .header,
+            .holy-grail-grid .left-sidebar,
+            .holy-grail-grid .right-sidebar,
+            .holy-grail-grid .footer {
+                overflow: hidden;
+            } */
+        }
+    </style>
+</head>
+<body>
+    <div class="holy-grail-grid">
+        <header class="header">Header</header>
+        <main class="main-content">Main content</main>
+        <section class="left-sidebar">Left sidebar</section>
+        <aside class="right-sidebar">Right sidebar</aside>
+        <footer class="footer">Footer</footer>
+    </div>
+</body>
+</html>
