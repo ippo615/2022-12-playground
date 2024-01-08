@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contenteditable with Caret Position</title>
+  <style>
+    .editable {
+      border: 1px solid #ccc;
+      padding: 10px;
+      min-height: 100px;
+    }
+    .highlight {
+        background-color: lime;
+    }
+  </style>
+</head>
+<body>
+
+<!-- <div id="editable" class="editable" contenteditable="true" oninput="onInput" onclick="updateInfo()" onkeydown="updateInfo()" onkeyup="updateInfo()"> -->
+<div id="editable" class="editable" contenteditable="true">
+  Start typing here... (note: this demo just shows how we can highlight "hello" and still let you type without messing up your typing)
+</div>
+<div>Caret Position: <span id="info-caret-position"></span></div>
+<div>Selected Text: <span id="info-selected-text"></span></div>
+<div>InnerHTML: <textarea id="info-innerhtml"></textarea></div>
+
+<script>
+
+function htmlToPlain( html ){
+    // first remove any \n's that might be hidden in the text
+	// replace all <br>'s with '\n'
+	// then remove ALL the tags
+	var result = html;
+    result = result.replace(/\n/gi, "");
+    result = result.replace(/\r/gi, "");
+    result = result.replace(/<div><br><\/div>/gi, '\n' );
+    result = result.replace(/<p><br><\/p>/gi, '\n' );
+    result = result.replace(/<div>/gi, '\n' );
+    result = result.replace(/<p>/gi, '\n' );
+	// result = result.replace(/(<br>)?((<\/p>)|(<\/div>))/gi, '\n' );
+	result = result.replace(/<br>/g, '\n' );
+	result = result.replace(/(<([^>]+)>)/gi, "");
+	return result;
+}
+function plainToHtml( text ){
+	var result = text;
+	result = result.replace(/\n/gi, '<br>' );
+	// result = result.replace(/\n/g, '</p><p>' );
+	// result = '<p>'+result+'</p>';
+	// result = result.replace(/<p><\/p>/g, '<p><br/></p>'); 
+	return result;
+}
+
+function highlightText() {
+    let text = document.getElementById("editable").innerHTML;
+    let cleaned = htmlToPlain(text);
+    let highlighted = cleaned.replace(/(hello)/gi, '<span class="highlight">$1</span>')
+    let newLines = plainToHtml(highlighted);
+    return newLines;
+}
+
+function onInput(event){
+    if (event.inputType === 'insertText' || event.inputType === 'deleteContentBackward' || event.inputType === 'insertCompositionText') {
+        runHighlight()
+    }
+    updateInfo();
+}
+document.getElementById("editable").addEventListener("input", onInput);
+document.getElementById("editable").addEventListener("keydown", updateInfo);
+document.getElementById("editable").addEventListener("keyup", updateInfo);
+
+function runHighlight(){
+    let caretPosition = getCaretPosition();
+    document.getElementById("editable").innerHTML = highlightText();
+    setCaretPosition(caretPosition);
+}
+function updateInfo() {
+    document.getElementById("info-caret-position").innerHTML = getCaretPosition();
+    document.getElementById("info-selected-text").innerHTML = getTextAtCaretPosition();
+    document.getElementById("info-innerhtml").value = document.getElementById("editable").innerHTML;
+}
+
+function getTextAtCaretPosition() {
+    var selection = window.getSelection();
+
+    if (selection.rangeCount > 0) {
+        var range = selection.getRangeAt(0);
+
+        if (range.collapsed) {
+            // If the range is collapsed, return the character at the caret position
+            var charAtCaret = range.startContainer.textContent.charAt(range.startOffset);
+            return charAtCaret;
+        } else {
+            // If there is a selection range, return the selected text
+            return range.toString();
+        }
+    }
+
+    return null;
+}
+
+// Function to save the caret position
+function getCaretPosition() {
+    var editableDiv = document.getElementById('editable');
+    var selection = window.getSelection();
+
+    // Save the current selection
+    var range = selection.getRangeAt(0);
+    var preSelectionRange = range.cloneRange();
+    preSelectionRange.selectNodeContents(editableDiv);
+    preSelectionRange.setEnd(range.startContainer, range.startOffset);
+
+    var start = preSelectionRange.toString().length;
+
+    return start;
+
+}
+
+// Function to restore the caret position
+function setCaretPositionNaive(caretPosition) {
+    var editableDiv = document.getElementById('editable');
+    var range = document.createRange();
+    var selection = window.getSelection();
+    range.setStart(editableDiv.childNodes[0], Math.min(caretPosition, editableDiv.innerText.length));
+    range.collapse(true);
+
+    selection.removeAllRanges();
+    selection.addRange(range);
+
+    // Focus on the contenteditable element
+    editableDiv.focus();
+}
+
+function setCaretPosition(caretPosition) {
+    var editableDiv = document.getElementById('editable');
+
+    var walker = document.createTreeWalker(editableDiv, NodeFilter.SHOW_TEXT, null, false);
+    var charCount = 0;
+    var found = false;
+
+    // Traverse the text nodes to find the correct position
+    while (walker.nextNode()) {
+        var node = walker.currentNode;
+        var nodeLength = node.length;
+
+        // Check if the caret position is within the current node
+        if (charCount + nodeLength >= caretPosition) {
+            var range = document.createRange();
+            range.setStart(node, caretPosition - charCount);
+            range.collapse(true);
+
+            var selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+
+            // Focus on the contenteditable element
+            editableDiv.focus();
+
+            found = true;
+            break;
+        }
+
+        charCount += nodeLength;
+    }
+
+    // If the caret position is not found, place the caret at the end
+    if (!found) {
+        var lastTextNode = editableDiv.lastChild;
+        var lastNodeLength = lastTextNode.length;
+
+        var lastRange = document.createRange();
+        lastRange.setStart(lastTextNode, lastNodeLength);
+        lastRange.collapse(true);
+
+        var lastSelection = window.getSelection();
+        lastSelection.removeAllRanges();
+        lastSelection.addRange(lastRange);
+
+        // Focus on the contenteditable element
+        editableDiv.focus();
+    }
+}
+
+</script>
+
+</body>
+</html>
