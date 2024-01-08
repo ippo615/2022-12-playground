@@ -52,34 +52,6 @@ function plainToHtml( text ){
 	return result;
 }
 
-function highlightText() {
-    let text = document.getElementById("editable").innerHTML;
-    let cleaned = htmlToPlain(text);
-    let highlighted = cleaned.replace(/(hello)/gi, '<span class="highlight">$1</span>')
-    let newLines = plainToHtml(highlighted);
-    return newLines;
-}
-
-function onInput(event){
-    if (event.inputType === 'insertText' || event.inputType === 'deleteContentBackward' || event.inputType === 'insertCompositionText') {
-        runHighlight()
-    }
-    updateInfo();
-}
-document.getElementById("editable").addEventListener("input", onInput);
-document.getElementById("editable").addEventListener("keydown", updateInfo);
-document.getElementById("editable").addEventListener("keyup", updateInfo);
-
-function runHighlight(){
-    let caretPosition = getCaretPosition();
-    document.getElementById("editable").innerHTML = highlightText();
-    setCaretPosition(caretPosition);
-}
-function updateInfo() {
-    document.getElementById("info-caret-position").innerHTML = getCaretPosition();
-    document.getElementById("info-selected-text").innerHTML = getTextAtCaretPosition();
-    document.getElementById("info-innerhtml").value = document.getElementById("editable").innerHTML;
-}
 
 function getTextAtCaretPosition() {
     var selection = window.getSelection();
@@ -101,7 +73,7 @@ function getTextAtCaretPosition() {
 }
 
 // Function to save the caret position
-function getCaretPosition() {
+function getCaretPosition(editableDiv) {
     var editableDiv = document.getElementById('editable');
     var selection = window.getSelection();
 
@@ -118,8 +90,7 @@ function getCaretPosition() {
 }
 
 // Function to restore the caret position
-function setCaretPositionNaive(caretPosition) {
-    var editableDiv = document.getElementById('editable');
+function setCaretPositionNaive(editableDiv, caretPosition) {
     var range = document.createRange();
     var selection = window.getSelection();
     range.setStart(editableDiv.childNodes[0], Math.min(caretPosition, editableDiv.innerText.length));
@@ -132,9 +103,7 @@ function setCaretPositionNaive(caretPosition) {
     editableDiv.focus();
 }
 
-function setCaretPosition(caretPosition) {
-    var editableDiv = document.getElementById('editable');
-
+function setCaretPosition(editableDiv, caretPosition) {
     var walker = document.createTreeWalker(editableDiv, NodeFilter.SHOW_TEXT, null, false);
     var charCount = 0;
     var found = false;
@@ -180,6 +149,38 @@ function setCaretPosition(caretPosition) {
         // Focus on the contenteditable element
         editableDiv.focus();
     }
+}
+
+
+var EDITABLE_DIV = document.getElementById("editable");
+
+function highlightText() {
+    let text = EDITABLE_DIV.innerHTML;
+    let cleaned = htmlToPlain(text);
+    let highlighted = cleaned.replace(/(hello)/gi, '<span class="highlight">$1</span>')
+    let newLines = plainToHtml(highlighted);
+    return newLines;
+}
+
+function onInput(event){
+    if (event.inputType === 'insertText' || event.inputType === 'deleteContentBackward' || event.inputType === 'insertCompositionText') {
+        runHighlight()
+    }
+    updateInfo();
+}
+EDITABLE_DIV.addEventListener("input", onInput);
+EDITABLE_DIV.addEventListener("keydown", updateInfo);
+EDITABLE_DIV.addEventListener("keyup", updateInfo);
+
+function runHighlight(){
+    let caretPosition = getCaretPosition(EDITABLE_DIV);
+    EDITABLE_DIV.innerHTML = highlightText();
+    setCaretPosition(EDITABLE_DIV, caretPosition);
+}
+function updateInfo() {
+    document.getElementById("info-caret-position").innerHTML = getCaretPosition(EDITABLE_DIV);
+    document.getElementById("info-selected-text").innerHTML = getTextAtCaretPosition();
+    document.getElementById("info-innerhtml").value = EDITABLE_DIV.innerHTML;
 }
 
 </script>
