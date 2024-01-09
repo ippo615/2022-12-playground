@@ -41,11 +41,12 @@
             <button id="btn-synth-voice-test">Test Voice</button>
         </div></div></aside>
         <footer class="footer"><div class="footer-content">
-            <div class="transcript-heading">Transcript</div>
+            <div class="transcript-heading">Transcript <span class="muted">(<span id="status-bar"></span>)</span></div>
             <label for="transcript-option-compact">Compact</label>
             <input type="checkbox" id="transcript-option-compact" />
             <label for="transcript-option-wrap">Wrap</label>
             <input type="checkbox" id="transcript-option-wrap" />
+            <div class="transcript-line" id="speech-interim"></div>
                 <div class="transcript-line">Your transcript will appear here. Your transcript will appear here. Your transcript will appear here. Your transcript will appear here. This line is more than 80 characters long to show some css tricks. Your transcript will appear here. Your transcript will appear here. Your transcript will appear here. Your transcript will appear here. This line is more than 80 characters long to show some css tricks. Your transcript will appear here. Your transcript will appear here. Your transcript will appear here. Your transcript will appear here. This line is more than 80 characters long to show some css tricks. Your transcript will appear here. Your transcript will appear here. Your transcript will appear here. Your transcript will appear here. This line is more than 80 characters long to show some css tricks.</div>
                 <div class="transcript-line">Your transcript will appear here. Your transcript will appear here. Your transcript will appear here. Your transcript will appear here. This line is more than 80 characters long to show some css tricks. Your transcript will appear here. Your transcript will appear here. Your transcript will appear here. Your transcript will appear here. This line is more than 80 characters long to show some css tricks. Your transcript will appear here. Your transcript will appear here. Your transcript will appear here. Your transcript will appear here. This line is more than 80 characters long to show some css tricks. Your transcript will appear here. Your transcript will appear here. Your transcript will appear here. Your transcript will appear here. This line is more than 80 characters long to show some css tricks.</div>
                 <div class="transcript-line">Your transcript will appear here. Your transcript will appear here. Your transcript will appear here. Your transcript will appear here. This line is more than 80 characters long to show some css tricks. Your transcript will appear here. Your transcript will appear here. Your transcript will appear here. Your transcript will appear here. This line is more than 80 characters long to show some css tricks. Your transcript will appear here. Your transcript will appear here. Your transcript will appear here. Your transcript will appear here. This line is more than 80 characters long to show some css tricks. Your transcript will appear here. Your transcript will appear here. Your transcript will appear here. Your transcript will appear here. This line is more than 80 characters long to show some css tricks.</div>
@@ -408,9 +409,16 @@
             speech.recognition.lang = langSelector.getLang();
         });
 
+        class PhraseAnalyzer {
+            constructor(){
+                this.windowLengthChars = 80;
+                this.window = "";
+            }
+        }
+
         class PhraseToAction {
             constructor(){
-                self.pharseToFunctionMap = {}
+                this.pharseToFunctionMap = {}
             }
         }
         
@@ -421,8 +429,6 @@
             cleanText = cleanText.replace(/[^\w\s\d]/g, "");
             cleanText = cleanText.replace(/\s+/g, ' ');
         }
-
-        
 
         </script>
 
