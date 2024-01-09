@@ -1,0 +1,44 @@
+.muted {opacity: 0.4}
+label, input, select {display: block;}
+label {
+    padding-top: 10px;
+}
+.transcript-heading {
+    text-align: center;
+    font-weight: bold;
+    opacity: 0.7;
+}
+/* The Web Accessibility Initiative (WCAG) guideline 1.4.8 states that,
+   in order to be accessible to all users, lines of text should be 80
+   or fewer characters (or 40 or fewer characters if the text is
+   Chinese, Japanese, or Korean).
+   Additionally: 
+   Line height (i.e., the spacing between lines of text): 1.5em (i.e., 1.5 times the font size)
+   Paragraph spacing: 2em
+   Word spacing: 0.16em
+   Letter spacing (i.e., tracking): 0.12em
+
+   Also, I totally should not have bothered to have options for making it more/less
+   legible but it's kinda cool to toggle styles in pure css (but imposes too many
+   other constaints).
+ */
+.footer-content label,
+.footer-content input {
+    display: inline-block;
+}
+.transcript-line {
+    line-height: 1.5em;
+    padding: 1em;
+    max-width: 80ch;
+}
+#transcript-option-compact:checked ~ .transcript-line {
+    line-height: 1em;
+    padding: 0em;
+}
+#transcript-option-wrap:not(:checked) ~ .transcript-line {
+    max-width: none;
+}
+
+.debug-highlight {
+    background-color: #88FF88;
+}
